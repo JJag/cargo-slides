@@ -20,6 +20,7 @@
 			link.type = 'text/css';
 			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
+
     </script>
 </head>
 <body>
@@ -31,11 +32,11 @@
         </section>
         <section>
             <section>
-                <h2>What is Cargo?</h2>
-                <p class="fragment">Cargo is a buid tool for Rust</p>
+                <h4>What is Cargo?</h4>
+                <p class="fragment">Cargo is a buid tool for Rust</h5>
             </section>
             <section>
-                <h2>What can it do?</h2>
+                <h4>What can it do?</h4>
                 <ul>
                     <li class="fragment">Initialize a project</li>
                     <li class="fragment">Compile Rust code</li>
@@ -48,13 +49,34 @@
                     <li class="fragment">...and much more</li>
                 </ul>
             </section>
+            <section>
+                <h4>Cargo project structure</h4>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    ├── Cargo.lock
+                    ├── Cargo.toml
+                    ├── benches         # benchmarks
+                    │   ├── bench1.rs
+                    │   └── bench4.rs
+                    ├── examples        # code examples
+                    │   ├── example1.rs
+                    │   └── example2.rs
+                    ├── src
+                    │   ├── bin         # other executables
+                    │   │   ├── bin1.rs
+                    │   │   └── bin2.rs
+                    │   ├── lib.rs
+                    │   └── main.rs
+                    └── tests           # integration tests
+                        ├── it_test1.rs
+                        └── it_test2.rs
+                </code></pre>
+            </section>
         </section>
+        <section>Let's create a library!</section>
         <section>
             <section>
-                <h2>Let's create new project</h2>
-            </section>
-            <section>
-                <pre><code class="bash" data-trim data-noescape>
+                <p>First, initialize a project</p>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
                     > <span class="fragment">cargo new hello</span>
                     <span class="fragment">Created binary (application) `hello` package
                     > </span><span class="fragment">tree hello</span><span class="fragment">
@@ -62,6 +84,7 @@
                     ├── Cargo.toml
                     └── src
                         └── main.rs
+
                     </span>
                 </code></pre>
             </section>
@@ -87,52 +110,363 @@
                 </div>
             </section>
             <section>
-                <h2>Let's run it</h2>
-                <section>
-                <pre><code class="bash" data-trim data-noescape>
-                    > <span class="fragment">cargo run</span>
-                    <span class="fragment">
-                        Compiling hello v0.1.0 (/Users/jakubjagusztyn/Documents/cargo-playground/hello)
-                        Finished dev [unoptimized + debuginfo] target(s) in 1.04s
-                         Running `target/debug/hello`</span>
-                    <span class="fragment"> Hello, world!</span>
+                <p>But we wanted to create a library
+                <p>
+                <ul>
+                    <li class="fragment">By default <code>cargo new</code> uses application template</li>
+                    <li class="fragment">To create library you should pass <code>--lib</code> option</li>
+                </ul>
+            </section>
+            <section>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo new --lib leftpad</span>
+                    <span class="fragment">Created library `leftpad` project
+                    > </span><span class="fragment">tree leftpad</span><span class="fragment">
+                    hello
+                    ├── Cargo.toml
+                    └── src
+                        └── lib.rs
+                    </span>
                 </code></pre>
-                </section>
+                <div class="fragment">
+                    <p>src/lib.rs</p>
+                    <pre><code class="rust" data-trim data-noescape>
+                    #[cfg(test)]
+                    mod tests {
+                        #[test]
+                            fn it_works() {
+                            assert_eq!(2 + 2, 4);
+                        }
+                    }
+                </code></pre>
+                </div>
+            </section>
+            <section>
+                <p>Coding time</p>
+                <pre><code data-trim data-noescape>
+                    <span class="fragment" data-fragment-index="6">/// Worst leftpad implementation ever</span>
+                    <span class="fragment" data-fragment-index="1">pub fn leftpad(s: &str, to_len: usize) -> String {</span>
+                    <span class="fragment" data-fragment-index="2">    let mut s = s.to_string();</span>
+                    <span class="fragment" data-fragment-index="3">        while s.chars().count() < to_len {</span>
+                    <span class="fragment" data-fragment-index="4">            s.insert(0, ' ');</span>
+                    <span class="fragment" data-fragment-index="3">         }</span>
+                    <span class="fragment" data-fragment-index="5">    s</span>
+                    <span class="fragment" data-fragment-index="1">}</span>
+                    </code></pre>
             </section>
         </section>
         <section>
             <section>
-                <h2>Managing project's dependencies</h2>
-                <p>To specify Rust dependencies we simply add its name and version under <code>[dependencies]</code>
-                    section of Cargo.toml.</p>
-                <p>Cargo will search <a>crates.io</a> for sources</p>
-            </section>
-            <section>
-                <pre><code class="toml" data-trim data-noescape>
-                    [package]
-                    name = "hello"
-                    version = "0.1.0"
-                    authors = ["JJag &lt;jakub.jagusztyn@gmail.com>"]
-
-                    [dependencies]
-                    <span class="fragment">random = "0.6"</span>
-                    <span class="fragment">bitflags = "1"</span>
-                    <span class="fragment">log = "*"</span>
+                <p>We have some code, so it's time to compile it</p>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo build</span>
+                    <span class="fragment">
+                     Compiling leftpad v0.1.0 (/Users/jakubjagusztyn/Documents/cargo-playground/leftpad)
+                      Finished dev [unoptimized + debuginfo] target(s) in 1.04s
+                    </span>
                 </code></pre>
             </section>
             <section>
-                <h3>Specifying version</h3>
+                <ul>
+                    <li class="fragment">Compiles your project(and its dependencies)</li>
+                    <li class="fragment">By default compiles only <code>src/</code></li>
+                    <li class="fragment">Artifacts are placed under <code>target/</code> directory
+                    <li class="fragment">By default uses debug profile(no optimizations, enabled debug symbols)
+                    </li>
+                    <li class="fragment">Use <code>--release</code> to enable compiler optimizations</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <p>Let's run it!</p>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo run</span>
+                    <span class="fragment">
+                        error: a bin target must be available for `cargo run`
+                    </span>
+                </code></pre>
+                <p class="fragment">Run what?</p>
+            </section>
+            <section>
+                <p>A CLI tool!</p>
+                <div class="fragment">
+                    <p>src/bin/leftpad.rs</p>
+                    <pre><code class="rust" data-trim>
+                    extern crate leftpad;
+
+                    use std::env;
+
+                    fn main() {
+                        let args: Vec&lt;String> = env::args().collect();
+                        let s = &args[1];
+                        let n = args[2].parse().unwrap();
+                        println!("{}", leftpad::leftpad(s, n));
+                    }
+                </code></pre>
+                </div>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo run -- foo 5</span>
+                    <span class="fragment">
+                       Finished dev [unoptimized + debuginfo] target(s) in 0.04s
+                        Running `target/debug/leftpad foo 5`
+                    &nbsp;&nbsp;foo
+                    </span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Creating a code example</p>
+                <pre class="fragment"><code class="rust" data-trim>
+                /// examples/leftpad_ex.rs
+                extern crate leftpad;
+
+                use leftpad::leftpad;
+
+                fn main() {
+                    println!("{}", leftpad("foo", 5));
+                }
+                </code></pre>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo run --examples leftpad_ex</span>
+                    <span class="fragment">
+                     Compiling leftpad v0.1.0 (/Users/jakubjagusztyn/Documents/cargo-playground/leftpad)
+                      Finished dev [unoptimized + debuginfo] target(s) in 0.41s
+                      Running `target/debug/examples/leftpad_ex`
+                    &nbsp;&nbsp;foo
+                    </span>
+                </code></pre>
+
+
+            </section>
+            <section>
+                <p><code>cargo run</code> summary</p>
+                <ul>
+                    <li class="fragment">If there's only one executable, it will be ran</li>
+                    <li class="fragment">Otherwise, use <code data-noescape=>--bin &lt;name></code></li>
+                    <li class="fragment"><code>--example &lt;name></code> to run <code>examples/&lt;name></code></li>
+                    <li class="fragment">Similarly to <code>build</code> it runs unoptimized code by default</li>
+                    <li class="fragment">Command line args: <code>cargo run --bin hello -- arg1 arg2</code></li>
+                </ul>
+            </section>
+
+        </section>
+        <section>
+            <section>
+                <p>Time to test!</p>
+            </section>
+            <section>
+                <p>First, let's write some tests...</p>
+                <pre><code class="rust" data-trim>
+                    /// src/lib.rs
+
+                    #[cfg(test)]
+                    mod tests {
+                        use super::leftpad;
+
+                        #[test]
+                        fn expanded() { assert_eq!(leftpad("foo", 5), "  foo"); }
+
+                        #[test]
+                        fn unchanged() { assert_eq!(leftpad("foo", 1), "foo"); }
+
+                        #[test]
+                        #[ignore]
+                        fn large() {
+                            let padded = leftpad("foo", 50_000);
+                            assert_eq!(padded.chars().count(), 50_000);
+                        }
+                    }
+                </code></pre>
+            </section>
+            <section>
+                <p>...and run them with <code>cargo test</code></p>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo test</span>
+                    <span class="fragment">
+                        running 3 tests
+                        test tests::large ... ignored
+                        test tests::unchanged ... ok
+                        test tests::expanded ... ok
+                    </span>
+                </code></pre>
+                <p class="fragment">By default all non-ignored test are executed</p>
+                <p class="fragment">Fun fact: even code in doc comments gets executed</p>
+
+            </section>
+            <section>
+                <p>Use <code>cargo test &lt;s></code> to filter tests by name</p>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo test unc</span>
+                    <span class="fragment">
+                        running 1 test
+                        test tests::unchanged ... ok
+                    </span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Running <code>#[ignored]</code> tests</p>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo test -- --ignored</span>
+                    <span class="fragment">
+                        running 1 test
+                        test tests::large ... ok
+                    </span>
+                </code></pre>
+            </section>
+            <section>
+                <p><code>cargo test</code> tips:</p>
+                <ul>
+                    <li class="fragment"><code>println!</code>s are only printed to console if the test fails</li>
+                    <li class="fragment">Use <code>--nocapture</code> to prevent that</li>
+                    <li class="fragment">Use <code>--test-threads=&lt;N></code> to control parallelism</li>
+                    <li class="fragment">Remember to pass these option to test binary - not to <code>cargo</code>(after
+                        <code>--</code>)
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <p>Okay, our library seems to work, but what's the performance?</p>
+                <p class="fragment">We could use <code>cargo bench</code> to find out</p>
+            </section>
+            <section>
+                <p>Writing a benchmark</p>
+                <pre><code class="rust" data-trim data-noescape>
+                <span class="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">/// benches/my_benchmark.rs</span>
+                <span class="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"></span>
+                <span class="fragment" data-fragment-index="2">#![feature(test)]</span>
+                <span class="fragment" data-fragment-index="2">extern crate test;</span>
+                <span class="fragment" data-fragment-index="3">extern crate leftpad;</span>
+                <span class="fragment" data-fragment-index="3"></span>
+                <span class="fragment" data-fragment-index="4">use leftpad::leftpad;</span>
+                <span class="fragment" data-fragment-index="4">use test::Bencher;</span>
+                <span class="fragment" data-fragment-index="5"></span>
+                <span class="fragment" data-fragment-index="5">#[bench]</span>
+                <span class="fragment" data-fragment-index="5">fn len_100(b: &mut Bencher) {</span>
+                <span class="fragment" data-fragment-index="6">   b.iter(|| leftpad("", 100));</span>
+                <span class="fragment" data-fragment-index="5">}</span>
+                <span class="fragment" data-fragment-index="7 ">#[bench]</span>
+                <span class="fragment" data-fragment-index="7 ">fn len_10_000(b: &mut Bencher) {</span>
+                <span class="fragment" data-fragment-index="7 ">   b.iter(|| leftpad("", 10_000));</span>
+                <span class="fragment" data-fragment-index="7 ">}</span>
+            </code></pre>
+            </section>
+            <section>
+                <p>Running a benchmark</p>
+            <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo bench</span>
+                    <span class="fragment">
+                    error[E0554]: #![feature] may not be used on the stable release channel
+                    --> benches/my_benchmark.rs:1:1
+                      |
+                    1 | #![feature(test)]
+                      | ^^^^^^^^^^^^^^^^^
+                    </span>
+                </code></pre>
+                <p class="fragment">Unfortunately, benchmarking is not yet in stable stdlib</p>
+                <p class="fragment">So what can we do?</p>
+            </section>
+            <section>
+                <h2>Use nightly!</h2>
+            </section>
+            <section>
+                <p>Running a benchmark(with nightly)</p>
+            <pre><code class="no-highlight" data-trim data-noescape>
+                > <span class="fragment">rustup install nightly</span>
+                <span class="fragment">.</span><span class="fragment">.</span><span class="fragment">.</span>
+                <span class="fragment">nightly-x86_64-apple-darwin updated - rustc 1.32.0-nightly (13c943992 2018-11-18)
+                > </span><span class="fragment">cargo +nightly bench</span><span class="fragment"> # or `rustup default nightly`</span><span class="fragment">
+                running 2 tests
+                test len_100    ... bench:       4,526 ns/iter (+/- 684)
+                test len_10_000 ... bench:  25,367,409 ns/iter (+/- 687,346)</span>
+            </code></pre>
+            </section>
+            <section>
+                <p>Almost 27 millis on averga:\</p>
+                <p class="fragment">Can we do better?</p>
+            </section>
+            <section>
+                <p>Let's try!</p>
+                <pre class="fragment"><code data-trim class="rust" data-noescape>
+                    <span class="fragment" data-fragment-index="1">pub fn leftpad(s: &str, to_len: usize) -> String {</span>
+                <span class="fragment" data-fragment-index="2">    format!("{:>1$}", s, to_len)</span>
+                    <span class="fragment" data-fragment-index="1">}</code></pre>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo +nightly bench</span><span class="fragment">
+                    running 2 tests
+                    test len_100    ... bench:       1,417 ns/iter (+/- 157)
+                    test len_10_000 ... bench:      73,030 ns/iter (+/- 3,822)</span>
+                </code></pre>
+
+                <p class="fragment">Performance improved! Hooray!</p>
+            </section>
+        </section>
+        <section>
+            <section>
+                <p>We're now ready to share our code</p>
+            </section>
+            <section>
+                <p>We can simply push it to some web-hosted git repository...</p>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">git remote add origin git@github.com:JJag/leftpad-rs.git</span>
+                    > <span class="fragment">git push origin master</span>
+                    > <span class="fragment">cargo install --git https://github.com/JJag/leftpad-rs</span>
+                    <span class="fragment">
+                     Updating git repository `https://github.com/JJag/leftpad-rs`
+                     Installing leftpad v0.1.0 (https://github.com/JJag/leftpad-rs#d70102dc)
+                      Compiling leftpad v0.1.0 (https://github.com/JJag/leftpad-rs#d70102dc)
+                       Finished release [optimized] target(s) in 1.41s
+                     Installing /Users/jakubjagusztyn/.cargo/bin/leftpad
+                    > </span><span class="fragment">leftpad foo 10</span>
+                    <span class="fragment">       foo</span>
+                </code></pre>
+            </section>
+            <section>
+                <p>... or we can publish to <a href="crates.io">crates.io</a></p>
+            </section>
+            <section></section>
+        </section>
+        <section>
+            <section>
+                <p>Managing project's dependencies</p>
+            </section>
+            <section>
+                <p>Adding dependencies</p>
+                <pre><code class="toml" data-trim data-noescape>
+                    [package]
+                    name = "rightpad"
+                    version = "0.1.0"
+                    authors = ["Jakub Jagusztyn &lt;jakub.jagusztyn@gmail.com>"]
+
+                    [dependencies]
+                    <span class="fragment">rand = "0.6"</span>
+                    <span class="fragment">foo = "^1.3"</span>
+                    <span class="fragment">bitflags = ">2, <2.5.4"</span>
+                    <span class="fragment">log = "*"</span>
+                    <span class="fragment">leftpad = { git = "https://github.com/JJag/github" }</span>
+                    <span class="fragment">
+                    [dev-dependencies]
+                    criterion = "0.2"
+                    </span><span class="fragment">
+                    [build-dependencies]
+                    cc = "=1.0.1"
+                    </span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Specifying version</p>
                 <ul>
                     <li>Cargo assumes that crates use <a href="https://semver.org/">SemVer</a></li>
                     <li>It can pick higher version than specified</li>
                 </ul>
             </section>
             <section>
-                <h2>Semantic Versioning</h2>
-                <h3><code data-noescape="">
+                <p>Semantic Versioning</p>
+                <p><code data-noescape="">
                     <span class="fragment highlight-current-red" data-fragment-index="1">MAJOR</span>.<span
                         class="fragment highlight-current-blue" data-fragment-index="2">MINOR</span>.<span
-                        class="fragment highlight-current-green" data-fragment-index="3">PATCH</span></code></h3>
+                        class="fragment highlight-current-green" data-fragment-index="3">PATCH</span></code></p>
                 <ul>
                     <li><span class="fragment highlight-current-red" data-fragment-index="1">MAJOR</span> - <b>incompatible</b>
                         API changes
@@ -146,58 +480,118 @@
                 </ul>
             </section>
             <section>
-                <h3>Specifying version</h3>
-                <div class="fragment">
-                    <h4>Caret requirement(defualt)</h4>
-                    <p>Cargo can select higher version than specified within the same MAJOR series</p>
-                    <pre><code>
-                        <span class="fragment">1.2.3 OR ^1.2.3: [1.2.3, 2.0.0)</span>
-                        <span class="fragment">1.2 OR ^1.2: [1.2.0, 2.0.0)</span>
-                        <span class="fragment">1 OR ^1: [1.0.0, 2.0.0)</span>
-
+                What do these funny characters before version mean?
+            </section>
+            <section>
+                <p>Caret(<code>^</code>) or no prefix</p>
+                <p class="fragment">Cargo can select higher version than specified, but within the same MAJOR series</p>
+                <pre><code>
+                        <span class="fragment">1.2.3 OR ^1.2.3    # [1.2.3, 2.0.0)</span>
+                        <span class="fragment">1.2 OR ^1.2        # [1.2.0, 2.0.0)</span>
+                        <span class="fragment">1 OR ^1            # [1.0.0, 2.0.0)</span>
                     </code></pre>
-                    </ul>
-                </div>
+                </ul>
             </section>
             <section>
-                <h3>Specifying version</h3>
-                <div>
-                    <h4>Tilde requirement</h4>
-                    <ul>
-                        <li class="fragment"><code>~1.2.3</code>: [1.2.3, 1.3.0)</li>
-                        <li class="fragment"><code>~1.2</code>: [1.2.0, 1.3.0)</li>
-                        <li class="fragment"><code>~1</code>: [1.0.0, 1.3.0)</li>
-                    </ul>
-                </div>
+                <p>Tilde(<code>~</code>)</p>
+                <p>Cargo can select higher version than specified, but within the same MINOR series</p>
+                <pre><code>
+                    <span class="fragment">~1.2.3    # [1.2.3, 1.3.0)</span>
+                    <span class="fragment">~1.2      # [1.2.0, 1.3.0)</span>
+                    <span class="fragment">~1        # [1.0.0, 1.3.0)</span>
+                </code></pre>
             </section>
             <section>
-                <h3>Specifying version</h3>
-                <div class="fragment">
-                    <h4>(In)equality requirement</h4>
-                </div>
-                <div class="fragment">
-                    <h4>Wildcard requirement</h4>
-                </div>
-
+                <p>(In)equality symbols(<code>=, <, >, <=, >=</code>)</p>
+                <p class="fragment">Means exactly what you expect</p>
+                <pre><code>
+                    <span class="fragment">~1.2.3    # [1.2.3, 1.3.0)</span>
+                    <span class="fragment">~1.2      # [1.2.0, 1.3.0)</span>
+                    <span class="fragment">~1        # [1.0.0, 1.3.0)</span>
+                </code></pre>
+                <span class="fragment">>1,<=1.2.3 # [1.0.0, 1.2.3]</span>
+                <span class="fragment">=1.2.3     # exactly 1.2.3</span>
             </section>
             <section>
-                <h3>Specifying version</h3>
-                <div class="fragment">
-                    <h4>(In)equality requirement</h4>
-                </div>
-                <div class="fragment">
-                    <h4>Wildcard requirement</h4>
-                </div>
-
-            </section>
-
-            <section>
-                <h3>Git dependencies</h3>
+                <p>Wildcard (<code>*</code>)</p>
+                <span class="fragment">~1.2.3    # [1.2.3, 1.3.0)</span>
+                <span class="fragment">~1.2      # [1.2.0, 1.3.0)</span>
+                <span class="fragment">~1        # [1.0.0, 1.3.0)</span>
             </section>
             <section>
-                <h3>Filesystem dependencies</h3>
+                <p>Upadating dependencies</p>
+                <p class="fragment">Exact versions of our dependencies are kept in Cargo.lock</p>
+                <p class="fragment">If new version of our dependency gets published, we can <code>update</code> it</p>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
+                > <span class="fragment">cargo update</span>
+                <span class="fragment">
+                Updating crates.io index
+                Updating log v0.4.5 -> v0.4.6
+                </span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Git dependencies</p>
+                <pre><code class="toml" data-trim data-noescape>
+                [dependencies]
+                <span class=fragment">foo = { git = "https://github.com/JJag/foo" }</span>
+                <span class=fragment">foo = { git = "https://github.com/JJag/foo", branch = "develop" }</span>
+                <span class=fragment">foo = { git = "https://github.com/JJag/foo", rev = "4be967c" }</span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Path dependencies</p>
+                <pre><code class="toml" data-trim data-noescape>
+                [dependencies]
+                <span class=fragment">foo = { path = "some/subdirectory" }</span>
+                <span class=fragment">foo = { path = "../sibling" }</span>
+                <span class=fragment">foo = { path = "/Absolute/path" }</span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Development dependencies</p>
+                <pre><code class="toml" data-trim data-noescape>
+                [dev-dependencies]
+                <span class=fragment">foo = "*"</span>
+                </code></pre>
+                <p class="fragment">Available in tests, benchmarks and examples</p>
+            </section>
+            <section>
+                <p>Build dependencies</p>
+                <pre><code class="toml" data-trim data-noescape>
+                [build-dependencies]
+                <span class=fragment">foo = "*"</span>
+                </code></pre>
+                <p class="fragment">Only available in build scripts</p>
+            </section>
+            <section>
+                <p>Override dependencies</p>
+                <p>Maybe skip this? </p>
             </section>
         </section>
+        </section>
+        <section>
+            Closer look at Cargo.toml
+        </section>
+        <section>
+            Build scripts
+        </section>
+        <section>
+            Configuring cargo
+        </section>
+        <section>
+            Generating documentation
+        </section>
+        <section>
+            Cargo fix
+        </section>
+        <section>
+            Cargo fmt
+        </section>
+        <section>
+            Cargo clippy
+        </section>
+
     </div>
 </div>
 
@@ -216,6 +610,48 @@
 					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
 				]
 			});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
