@@ -28,11 +28,14 @@
         <section data-markdown>
             ![Cargo Logo](img/cargo_logo.png)
             # A tour of Cargo
+            Jakub Jagusztyn
         </section>
         <section>
             <section>
                 <h4>What is Cargo?</h4>
-                <p class="fragment">Cargo is a buid tool for Rust</h5>
+                <p class="fragment">Cargo is a build tool/package manager for Rust</h5>
+                <p class = "fragment">Like Maven for Java or npm for JS</p>
+                <p></p>
             </section>
             <section>
                 <h4>What can it do?</h4>
@@ -49,9 +52,9 @@
                 </ul>
             </section>
             <section>
-                <p>Cargo project structure</p>
+                <p>Project structure</p>
                 <pre><code class="no-highlight" data-trim data-noescape>
-                    ├── build.rs        # build script
+                    ├── build.rs
                     ├── Cargo.lock
                     ├── Cargo.toml
                     ├── benches         # benchmarks
@@ -70,6 +73,32 @@
                         ├── it_test1.rs
                         └── it_test2.rs
                 </code></pre>
+            </section>
+            <section>
+                <p>TOML</p>
+                <p>Cargo uses <a href="https://github.com/toml-lang/toml">TOML</a> for configuration</p>
+                <pre><code class="toml" data-trim data-noescape>
+                <span class="fragment"># this is a comment</span>
+                <span class="fragment">[package] # this is a table</span>
+                <span class="fragment">name = "leftpad" # this is key-value pair(which is a member of [package]</span>
+                <span class="fragment">authors = ["JJag"] # the value here is an array</span>
+                <span class="fragment">[dependencies]</span>
+                <span class="fragment">log = {version = "*", optional = true} # this is inline table</span>
+                <span class="fragment">[dependencies.log] # this is equivalent of the line above
+                version = "*"
+                optional = true
+                </span>
+                <span class="fragment">[[bin]] # double-brackets mean `bin` is array of tables
+                name = "foo"
+                path = "src/bin/foo.rs"
+
+                [[bin]]
+                name = "bar"
+                path = "src/bin/bar.rs"
+                </span>
+
+                </code></pre>
+
             </section>
         </section>
         <section>Let's create a library!</section>
@@ -109,14 +138,10 @@
                 </div>
             </section>
             <section>
-                <p>But we wanted to create a library
-                <p>
-                <ul>
-                    <li class="fragment">By default <code>cargo new</code> uses application template</li>
-                    <li class="fragment">To create library you should pass <code>--lib</code> option</li>
-                </ul>
+                <p>But we wanted to create a library</p>
             </section>
             <section>
+                <p>Initlizing a library project</p>
                 <pre><code class="no-highlight" data-trim data-noescape>
                     > <span class="fragment">cargo new --lib leftpad</span>
                     <span class="fragment">Created library `leftpad` project
@@ -141,33 +166,63 @@
                 </div>
             </section>
             <section>
-                <p>Coding time</p>
+                <p>Let's add implementation</p>
                 <pre><code data-trim data-noescape>
                     <span class="fragment" data-fragment-index="6">/// Worst leftpad implementation ever</span>
                     <span class="fragment" data-fragment-index="1">pub fn leftpad(s: &str, to_len: usize) -> String {</span>
                     <span class="fragment" data-fragment-index="2">    let mut s = s.to_string();</span>
-                    <span class="fragment" data-fragment-index="3">        while s.chars().count() < to_len {</span>
-                    <span class="fragment" data-fragment-index="4">            s.insert(0, ' ');</span>
-                    <span class="fragment" data-fragment-index="3">         }</span>
+                    <span class="fragment" data-fragment-index="3">    while s.chars().count() < to_len {</span>
+                    <span class="fragment" data-fragment-index="4">        s.insert(0, ' ');</span>
+                    <span class="fragment" data-fragment-index="3">    }</span>
                     <span class="fragment" data-fragment-index="5">    s</span>
                     <span class="fragment" data-fragment-index="1">}</span>
                     </code></pre>
             </section>
+            <section>
+                <p><code>cargo new</code> summary</p>
+                <ul>
+                    <li class="fragment"><code>--bin</code>(or no option) to init an executable</li>
+                    <li class="fragment"><code>--lib</code> to init a library</li>
+                    <li class="fragment">Initializes git repo(unless <code>--vcs none)</code></li>
+                    <li class="fragment">Custom templates are not supported(yet)</li>
+                </ul>
+            </section>
         </section>
         <section>
             <section>
-                <p>We have some code, so it's time to compile it</p>
+                <p>We have some code, so let's compile it</p>
                 <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
                     > <span class="fragment">cargo build</span>
                     <span class="fragment">
                      Compiling leftpad v0.1.0 (/Users/jakubjagusztyn/Documents/cargo-playground/leftpad)
                       Finished dev [unoptimized + debuginfo] target(s) in 1.04s
+                    > </span><span class="fragment"> tree target</span>
+                    <span class="fragment">
+                        target
+                        └── debug
+                            ├── deps
+                            │   ├── leftpad-ec5d8e1b4e128710.d
+                            │   └── libleftpad-ec5d8e1b4e128710.rlib
+                            ├── incremental
+                            │   └── leftpad-185h2tydnryvy
+                            │       ├── s-f6v36pz360-1g90vre-2yojh78r8kjff
+                            │       │   ├── 4n49resrahfjvtp7.bc.z
+                            │       │   ├── 4n49resrahfjvtp7.o
+                            │       │   ├── dep-graph.bin
+                            │       │   ├── query-cache.bin
+                            │       │   └── work-products.bin
+                            │       └── s-f6v36pz360-1g90vre.lock
+                            ├── libleftpad.d
+                            └── <b>libleftpad.rlib</b>
                     </span>
                 </code></pre>
             </section>
             <section>
+                    <p><code>cargo build</code> summary</p>
                 <ul>
                     <li class="fragment">Compiles your project(and its dependencies)</li>
+                    <li class="fragment">For applications, creates appropriate executable</li>
+                    <li class="fragment">For libraries, create <code>rlib</code> static library</li>
                     <li class="fragment">By default compiles only <code>src/</code></li>
                     <li class="fragment">Artifacts are placed under <code>target/</code> directory
                     <li class="fragment">By default uses debug profile(no optimizations, enabled debug symbols)
@@ -189,19 +244,18 @@
             </section>
             <section>
                 <p>A CLI tool!</p>
-                <div class="fragment">
-                    <p>src/bin/leftpad.rs</p>
-                    <pre><code class="rust" data-trim>
-                    extern crate leftpad;
-
-                    use std::env;
-
-                    fn main() {
-                        let args: Vec&lt;String> = env::args().collect();
-                        let s = &args[1];
-                        let n = args[2].parse().unwrap();
-                        println!("{}", leftpad::leftpad(s, n));
-                    }
+                <div>
+                    <pre><code class="rust" data-trim data-noescape>
+                        <span class="fragment" data-fragment-index="1">/// src/bin/leftpad.rs</span>
+                        <span class="fragment" data-fragment-index="1"></span>
+                        <span class="fragment" data-fragment-index="1">use std::env;</span>
+                        <span class="fragment" data-fragment-index="1"></span>
+                        <span class="fragment" data-fragment-index="1">fn main() {</span>
+                        <span class="fragment" data-fragment-index="2">    let args: Vec&lt;String> = env::args().collect();</span>
+                        <span class="fragment" data-fragment-index="3">    let s = &args[1];</span>
+                        <span class="fragment" data-fragment-index="4">    let n = args[2].parse().unwrap();</span>
+                        <span class="fragment" data-fragment-index="5">    println!("{}", leftpad::leftpad(s, n));</span>
+                        <span class="fragment" data-fragment-index="1">}</span>
                 </code></pre>
                 </div>
                 <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
@@ -238,7 +292,7 @@
 
             </section>
             <section>
-                <p><code>cargo run</code> quick tips:</p>
+                <p><code>cargo run</code> summary</p>
                 <ul>
                     <li class="fragment">If there's only one executable, it will be ran</li>
                     <li class="fragment">Otherwise, use <code data-noescape=>--bin &lt;name></code></li>
@@ -255,26 +309,23 @@
             </section>
             <section>
                 <p>First, let's write some tests...</p>
-                <pre><code class="rust" data-trim>
-                    /// src/lib.rs
-
-                    #[cfg(test)]
-                    mod tests {
-                        use super::leftpad;
-
-                        #[test]
-                        fn expanded() { assert_eq!(leftpad("foo", 5), "  foo"); }
-
-                        #[test]
-                        fn unchanged() { assert_eq!(leftpad("foo", 1), "foo"); }
-
-                        #[test]
-                        #[ignore]
-                        fn large() {
-                            let padded = leftpad("foo", 50_000);
-                            assert_eq!(padded.chars().count(), 50_000);
-                        }
-                    }
+                <pre><code class="rust" data-trim data-noescape>
+                    <span class="fragment" data-fragment-index="1">/// src/lib.rs</span>
+                    <span class="fragment" data-fragment-index="1"></span>
+                    <span class="fragment" data-fragment-index="2">#[cfg(test)]</span>
+                    <span class="fragment" data-fragment-index="2">mod tests {</span>
+                    <span class="fragment" data-fragment-index="3">    use super::leftpad;</span>
+                    <span class="fragment" data-fragment-index="4">    #[test]</span>
+                    <span class="fragment" data-fragment-index="4">    fn expanded() { assert_eq!(leftpad("foo", 5), "   foo"); }</span>
+                    <span class="fragment" data-fragment-index="5">    #[test]</span>
+                    <span class="fragment" data-fragment-index="5">    fn unchanged() { assert_eq!(leftpad("foo", 1), "foo"); }</span>
+                    <span class="fragment" data-fragment-index="6">    #[test]</span>
+                    <span class="fragment" data-fragment-index="6">    #[ignore]</span>
+                    <span class="fragment" data-fragment-index="6">    fn large() {</span>
+                    <span class="fragment" data-fragment-index="6">        let padded = leftpad("foo", 50_000);</span>
+                    <span class="fragment" data-fragment-index="6">        assert_eq!(padded.chars().count(), 50_000);</span>
+                    <span class="fragment" data-fragment-index="6">    }</span>
+                    <span class="fragment" data-fragment-index="2">}</span>
                 </code></pre>
             </section>
             <section>
@@ -282,15 +333,25 @@
                 <pre><code class="no-highlight" data-trim data-noescape>
                     > <span class="fragment">cargo test</span>
                     <span class="fragment">
-                        running 3 tests
-                        test tests::large ... ignored
-                        test tests::unchanged ... ok
-                        test tests::expanded ... ok
+                    running 3 tests
+                    test tests::large ... ignored
+                    test tests::unchanged ... ok
+                    test tests::expanded ... FAILED
+
+                    failures:
+
+                    ---- tests::expanded stdout ----
+                    thread 'tests::expanded' panicked at 'assertion failed: `(left == right)`
+                      left: `"  foo"`,
+                     right: `"   foo"`', src/lib.rs:32:9
+                    note: Run with `RUST_BACKTRACE=1` for a backtrace.
+
+                    failures:
+                        tests::expanded
+
+                    test result: FAILED. 1 passed; 1 failed; 1 ignored; 0 measured; 0 filtered out
                     </span>
                 </code></pre>
-                <p class="fragment">By default all non-ignored test are executed</p>
-                <p class="fragment">Fun fact: even code in doc comments gets executed</p>
-
             </section>
             <section>
                 <p>Use <code>cargo test &lt;s></code> to filter tests by name</p>
@@ -313,14 +374,15 @@
                 </code></pre>
             </section>
             <section>
-                <p><code>cargo test</code> tips:</p>
+                <p><code>cargo test</code></p>
                 <ul>
-                    <li class="fragment"><code>println!</code>s are only printed to console if the test fails</li>
+                    <li class="fragment">By default all non-ignored tests are executed</li>
+                    <li class="fragment">Example gets compiled too</li>
+                    <li class="fragment">Even code snippets in doc comments are executed!</li>
+                    <li class="fragment"><code>println!</code>s are only printed if the test fails</li>
                     <li class="fragment">Use <code>--nocapture</code> to prevent that</li>
                     <li class="fragment">Use <code>--test-threads=&lt;N></code> to control parallelism</li>
-                    <li class="fragment">Remember to pass these option to test binary - not to <code>cargo</code>(after
-                        <code>--</code>)
-                    </li>
+                    <li class="fragment">Pass options to test binary - not to <code>cargo</code>(after<code>--</code>)</li>
                 </ul>
             </section>
         </section>
@@ -383,8 +445,8 @@
             </section>
             <section>
                 <p>Can we do better?</p>
-                <p class="fragment">Let's try!</p>
-                <pre class="fragment"><code data-trim class="rust" data-noescape>
+                <p class="fragment" data-fragment-index="0">Let's try!</p>
+                <pre><code data-trim class="rust" data-noescape>
                     <span class="fragment" data-fragment-index="1">pub fn leftpad(s: &str, to_len: usize) -> String {</span>
                     <span class="fragment" data-fragment-index="2">    format!("{:>1$}", s, to_len)</span>
                     <span class="fragment" data-fragment-index="1">}</span>
@@ -405,8 +467,10 @@
             <section>
                 <p>We can simply push it to some web-hosted git repository...</p>
                 <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
-                    > <span class="fragment">git remote add origin git@github.com:JJag/leftpad-rs.git</span>
-                    > <span class="fragment">git push origin master</span>
+                    > <span class="fragment">git remote add origin git@github.com:JJag/leftpad-rs.git
+                    > </span><span class="fragment">git push origin master</span>
+                </code></pre>
+                <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
                     > <span class="fragment">cargo install --git https://github.com/JJag/leftpad-rs</span>
                     <span class="fragment">
                      Updating git repository `https://github.com/JJag/leftpad-rs`
@@ -420,8 +484,24 @@
             </section>
             <section>
                 <p>... or we can publish to <a href="crates.io">crates.io</a></p>
+                <ul>
+                    <li class="fragment">As simple as typing <code>cargo publish</code><span class="fragment">, but...</span></li>
+                    <li class="fragment">Need account on crates.io</li>
+                    <li class="fragment">Requires specifying some metadata(license, etc)</li>
+                    <li class="fragment">Cannot be unpublished</li>
+                </ul>
             </section>
-            <section></section>
+            <section>
+                <p>Publishing your code</p>
+                <ul>
+                    <li class="fragment">For small experimental projects publishing to git is often enough</li>
+                    <li class="fragment">But if your crate is meant to be used widely, push to crates.io</li>
+                    <li class="fragment">Custom registries are supported, but this feature is still unstable</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <p>Hooray! We published our library/application <span class="fragment">(kind of)</span></p>
         </section>
         <section>
             <section>
@@ -437,7 +517,7 @@
 
                     [dependencies]
                     <span class="fragment">rand = "0.6"</span>
-                    <span class="fragment">foo = "^1.3"</span>
+                    <span class="fragment">postgres = "^1"</span>
                     <span class="fragment">bitflags = ">2, <2.5.4"</span>
                     <span class="fragment">log = { version = "*", optional = true }</span>
                     <span class="fragment">leftpad = { git = "https://github.com/JJag/github" }</span>
@@ -485,13 +565,13 @@
                 <pre><code data-noescape data-trim>
                     <span class="fragment">~1.2.3    # [1.2.3, 1.3.0)</span>
                     <span class="fragment">~1.2      # [1.2.0, 1.3.0)</span>
-                    <span class="fragment">~1        # [1.0.0, 1.1.0)</span>
+                    <span class="fragment">~1        # [1.0.0, 2.0.0)</span>
                 </code></pre>
             </section>
             <section>
                 <p>(In)equality symbols (<code>=, <, >, <=, >=</code>)</p>
                 <pre><code data-noescape data-trim>
-                    <span class="fragment">>1,<=1.2.3 # [1.0.0, 1.2.3]</span>
+                    <span class="fragment">>=1.0.1,<=1.2.0 # [1.0.1, 1.3.0)</span>
                     <span class="fragment">=1.2.3     # exactly 1.2.3</span>
                 </code></pre>
             </section>
@@ -505,9 +585,47 @@
             </section>
             <section>
                 <p>Upadating dependencies</p>
+            </section>
+            <section>
+                <p>What is Cargo.lock?</p>
+                <pre class="toml fragment"><code data-noescape data-trim>
+                    /// Cargo.toml
+                    [dependencies]
+                    log = "*"
+                </code></pre>
+                <pre class="toml fragment"><code data-noescape data-trim>
+                    [[package]]
+                    name = "cfg-if"
+                    version = "0.1.6"
+                    source = "registry+https://github.com/rust-lang/crates.io-index"
+
+                    [[package]]
+                    name = "leftpad"
+                    version = "0.1.0"
+                    dependencies = [
+                     "log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)",
+                    ]
+
+                    [[package]]
+                    name = "log"
+                    version = "0.4.5"
+                    source = "registry+https://github.com/rust-lang/crates.io-index"
+                    dependencies = [
+                     "cfg-if 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+                    ]
+
+                    [metadata]
+                    "checksum cfg-if 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "082bb9b28e00d3c9d39cc03e64ce4cea0f1bb9b3fde493f0cbc008472d22bdf4"
+                    "checksum log 0.4.5 (registry+https://github.com/rust-lang/crates.io-index)" = "c84ec4b527950aa83a329754b01dbe3f58361d1c5efacd1f6d68c494d08a17c6"
+                </code></pre>
+
+            </section>
+            <section>
+                <p>Updating dependencies</p>
                 <ul>
-                <li class="fragment">Exact versions of our dependencies are kept in Cargo.lock</li>
-                <li class="fragment">Use <code>cargo update</code> to update them</li>
+                    <li class="fragment">Exact versions of our dependencies are kept in Cargo.lock</li>
+                    <li class="fragment">Should I <code>.gitignore</code> Cargo.lock?</li>
+                    <li class="fragment">Use <code>cargo update</code> to update dependencies</li>
                 </ul>
                 <pre class="fragment"><code class="no-highlight" data-trim data-noescape>
                 > <span class="fragment">cargo update</span>
@@ -551,48 +669,279 @@
                 </code></pre>
                 <p class="fragment">Only available in build scripts</p>
             </section>
-            <section>
-                <p>Override dependencies</p>
-                <p>Maybe skip this? </p>
-            </section>
         </section>
         <section>
             <section>
-                <p>Closer look at Cargo.toml</p>
+                <p>Conditional compilation</p>
             </section>
             <section>
-                <p>TOML</p>
-                <pre><code class="toml" data-trim data-noescape>
-                <span class=fragment"># this is a comment</span>
-                <span class=fragment">[package] # this is a table</span>
-                <span class=fragment">name = "leftpad" # this is key-value pair(which is a member of [package]</span>
-                <span class=fragment">authors = ["JJag"] # the value here is an array</span>
-                <span class=fragment">[dependencies]</span>
-                <span class=fragment">log = {version = "*", optional = true} # this is inline table</span>
-                <span class=fragment">[dependencies.log] # this is equivalent of the line above
-                                      version = "*"
-                                      optional = true
-                </span>
-                <span class=fragment">[[bin]] # double-brackets mean `bin` is array of tables
-                                      name = "foo"
-                                      path = "src/bin/foo.rs
+                <p>Feature flags can be used to enable conditional compilation</p>
+                <ul>
+                </ul>
+            </section>
+            <section>
+                <p>Declaring features</p>
+                <pre><code class="toml" data-noescape data-trim>
+                    ### Cargo.toml
+                    [dependencies]
+                    log = { version = "*", optional = true }
+                    postgres = "*"
 
-                                      [[bin]]
-                                      name = "bar"
-                                      path = "src/bin/bar.rs
-                </span>
-                <span class=fragment"></span>
-
+                    [features]
+                    logging = ["log", "postgres/log"] # aggregates multiple features and forwards feature to dependency
+                    foo = []                          # declaring the name to use in `cfg` macro and attribute
+                    default = []                      # features in this array will be enabled by defualt
+                                                      # unless build with `--no-default-features`
                 </code></pre>
+            </section>
+            <section>
+                <p>Feature-dependant code</p>
+                <pre><code class="rust" data-trim>
+                    #cfg[feature="foo"]
+                    pub fn foo() {
+                        println!("foo");
+                    }
+                </code></pre>
+                <pre><code class="rust" data-trim>
+                    pub fn info(msg: $str) {
+                        if cfg!(feature = "log") {
+                            log::info(msg);
+                        }
+                    }
+                </code></pre>
+            </section>
+            <section>
+                <p>Enabling features</p>
+                <pre><code class="toml" data-noescape data-trim>
+                > cargo build --feature logging
+                </code></pre>
+            </section>
+            <section>
+                <p>Features summary</p>
+                <ul>
+                    <li class="fragment">Dependencies can be <code>optional</code></li>
+                    <li class="fragment">Code can be marked with <code>#[cfg(feature = "foo")]</code> attribute</li>
+                    <li class="fragment"><code>cfg!(feature = "foo")</code> macro can be used in <code>if</code> statements</li>
+                    <li class="fragment">Should be used to enable optional <i>features</i> in application</li>
+                    <li class="fragment">Usually should be avoided in libraries</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <p>Build scripts</p>
+            </section>
+            <section>
+                <p>Sometimes <code>cargo build</code> is not enough</p>
+                <ul>
+                    <li class="fragment">Generating Rust code</li>
+                    <li class="fragment">Compiling bundled C code</li>
+                    <li class="fragment">Locating native libraries</li>
+                </ul>
+            </section>
+                <section>
+                    <p><code>build.rs</code> to the rescue</p>
+                <ul>
+                    <li class="fragment">Gets called before compiling our code</li>
+                    <li class="fragment">Can pass flags settings to cargo via <code>println!</code></li>
+                </ul>
+            </section>
+            <section>
+                <p>Demo: compiling C code</p>
+                <pre><code class="fragment c" data-trim>
+                /// src/foo.c
+                int foo() {
+                    return 5;
+                }</code></pre>
+                <pre><code class="fragment rust" data-trim>
+                /// src/main.rs
+                extern {
+                    fn foo() -> i32;
+                }
 
+                fn main() {
+                    let x = unsafe { foo() };
+                    println!("{}", x);
+                }</code></pre>
+            </section>
+            <section>
+                <pre><code class="fragment toml" data-trim>
+                # Cargo.toml
+                [build-dependencies]
+                cc = "1"</code></pre>
+                <pre><code class="fragment rust" data-trim>
+                /// build.rs
+                extern crate cc;
+
+                fn main() {
+                    cc::Build::new()
+                        .file("src/foo.c")
+                        .compile("foo");
+                }</code></pre>
+            </section>
+            <section>
+                <pre><code class="fragment rust" data-trim data-noescape="">
+                > <span class="fragment">cargo build -vv</span>
+                <span class="fragment">(...)</span>
+                <span class="fragment">running: "cc" (...)
+                    "-o" "(...)/example/target/debug/build/example-8b4e72261d5655d7/out/src/foo.o"
+                    "-c" "src/foo.c"</span>
+                <span class="fragment">(...)</span>
+                <span class="fragment">cargo:rustc-link-lib=static=foo</span>
+                <span class="fragment">cargo:rustc-link-search=native=(...)/example/target/debug/build/example-8b4e72261d5655d7/out</span>
+                <span class="fragment">(...)</span>
+                <span class="fragment">> </span> <span class="fragment">cargo run</span>
+                <span class="fragment">(...)</span>
+                <span class="fragment">5</span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Build scripts summary</p>
+                <ul>
+                    <li class="fragment">Commonly used in wrappers for C libraries</li>
+                    <li class="fragment">Configures cargo behaviours via <code>println!</code></li>
+                    <li class="fragment">Can provide compile time information to our crate(git SHA for example)</li>
+                    <li class="fragment">Can access only <code>[build-dependencies]</code></li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <p>Workspaces</p>
+            </section>
+            <section>
+                <p>Problem</p>
+                <ul>
+                    <li class="fragment">Our project got large</li>
+                    <li class="fragment">We decided to split it to multiple crates</li>
+                    <li class="fragment">There are many shared dependencies</li>
+                    <li class="fragment">You would like to compile/test them all at once</li>
+                </ul>
+            </section>
+            <section>
+                <p>Solution: workspaces</p>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cargo new large-project
+                    > </span><span class="fragment">cargo new large-project/a
+                    > </span><span class="fragment">cargo new large-project/b</span>
+                </code></pre>
+                <pre class="fragment"><code class="toml" data-trim data-noescape>
+                    /// large-project/Cargo.toml
+                    # [package] is not required if root only aggregates projects
+                    [workspace] # We have to declare root to be workspace
+                    members = ["a", "b"]
+                </code></pre>
+            </section>
+            <section>
+                <pre class="fragment"><code class="toml" data-trim data-noescape>
+                    /// large-project/a/Cargo.toml
+                    [package]
+                    name = "a"
+                    [dependencies]
+                    log = "0.4"
+                </code></pre>
+                <pre class="fragment"><code class="toml" data-trim data-noescape>
+                    /// large-project/a/Cargo.toml
+                    [package]
+                    name = "a"
+                    [dependencies]
+                    log = "0.4"
+                </code></pre>
+            </section>
+            <section>
+                <pre><code class="no-highlight" data-trim data-noescape>
+                    > <span class="fragment">cd large-project
+                    > </span><span class="fragment">cargo build
+                       Compiling cfg-if v0.1.6
+                       Compiling log v0.4.6
+                       Compiling b v0.1.0 (.../large-project/b)
+                       Compiling a v0.1.0 (.../large-project/a)
+                        Finished dev [unoptimized + debuginfo] target(s) in 1.05s
+                    > </span><span class="fragment">tree .</span><span class="fragment">
+                    .
+                    ├── Cargo.lock      # only one lockfile
+                    ├── Cargo.toml
+                    ├── a
+                    │   ├── Cargo.toml
+                    │   └── src
+                    │       └── main.rs
+                    ├── b
+                    │   ├── Cargo.toml
+                    │   └── src
+                    │       └── main.rs
+                    └── target          # only one target directory
+                         └─ ...
+                    </span>
+                </code></pre>
+            </section>
+            <section>
+                <p>Workspaces summary</p>
+                <ul>
+                    <li class="fragment">Group related crates together</li>
+                    <li class="fragment">Allow reuse of dependencies</li>
+                    <li class="fragment">Easier building for multiple creates</li>
+                    <li class="fragment"><code>-p NAME</code> option can be used to build single crate</li>
+                    <li class="fragment"><code>publish</code> still have to be invoked separately</li>
+                </ul>
             </section>
 
         </section>
         <section>
-            Build scripts
-        </section>
-        <section>
-            Configuring cargo SKIP
+            <section>
+                <p>Configuring cargo</p>
+            </section>
+            <section>
+                <ul>
+                   <li class="fragment">Annoyed by cargo defaults?</li>
+                   <li class="fragment">You don't use git?</li>
+                   <li class="fragment">Want to use crates.rs instead of crates.io?</li>
+                   <li class="fragment">Tired of typing <code>run --release</code>?</li>
+                </ul>
+            </section>
+            <section>
+                <h2>We have a solution for you!</h2>
+                <p class="fragment"><code>.cargo/config</code></p>
+            </section>
+            <section>
+                <p>Example config</p>
+                <pre><code data-trim data-noescape class="toml">
+                    <span class="fragment">
+                        [cargo-new]
+                        vcs = "none"
+                    </span><span class="fragment">
+                        [registry]
+                        index = "https://crates.rs"
+                    </span><span class="fragment">
+                        [http]
+                        proxy = "my-proxy:1234"
+                    </span><span class="fragment">
+                        [target."x86_64-apple-darwin"]
+                        rustflags = ["--some-mac-only-flag"]
+                    </span><span class="fragment">
+                        [build]
+                        jobs = 1
+                    </span><span class="fragment">
+                        [term]
+                        verbose = true
+                    </span><span class="fragment">
+                        [alias]
+                        rr = "run --release"
+                </span>
+                </code></pre>
+            </section>
+            <section>
+                <p><code>.cargo/config</code> summary</p>
+                <ul>
+                    <li class="fragment">Allows to change cargo defualts</li>
+                    <li class="fragment">Can be defined per project</li>
+                    <li class="fragment">And globally in <code>~/.cargo/config</code></li>
+                    <li class="fragment">You rarely want to touch this</li>
+                    <li class="fragment">Configs can be overriden by env variables. For example
+                    <code>CARGO_BUILD_JOBS=16</code></li>
+                </ul>
+
+            </section>
+
         </section>
         <section>
             <section>
@@ -621,7 +970,7 @@
                     <li class="fragment">Formats your code automatically</li>
                     <li class="fragment">Not installed by default</li>
                     <li class="fragment"><code>rustup component add rustfmt-preview</code> to install</li>
-                    <li class="fragment"><code>cargo fmt -- --check</code> - great for CI check</li>
+                    <li class="fragment"><code>cargo fmt -- --check</code> - great for CI</li>
                     <li class="fragment"><a href="https://github.com/rust-lang-nursery/rustfmt/blob/master/Configurations.md">Configurable</a></li>
                 </ul>
             </section>
